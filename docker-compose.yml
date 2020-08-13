@@ -1,0 +1,125 @@
+version: "3.2"
+
+services:
+  api:
+    build:
+      context: .
+    image: moleculer-prometheus-demo
+    hostname: api ## (Optional) Define the hostname
+    container_name: moleculer-prometheus-demo-api
+    env_file: docker-compose.env
+    environment:
+      SERVICES: api
+      PORT: 3000
+    depends_on:
+      - nats
+    ports:
+      - 9100:3030 ## Add a port in order to access the metrics
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=api"
+      - "traefik.port=3000"
+      - "traefik.frontend.entryPoints=http"
+      - "traefik.frontend.rule=PathPrefix:/"
+    networks:
+      - internal
+
+  greeter:
+    build:
+      context: .
+    image: moleculer-prometheus-demo
+    hostname: greeter ## (Optional) Define the hostname
+    container_name: moleculer-prometheus-demo-greeter
+    env_file: docker-compose.env
+    environment:
+      SERVICES: greeter
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - nats
+    ports:
+      - 9200:3030 ## Add a port in order to access the metrics
+    networks:
+      - internal
+    volumes:
+      - ./prometheus:/etc/prometheus ## Share "prometheus" dir with greeter service
+
+  replica:
+    build:
+      context: .
+    image: moleculer-prometheus-demo
+    hostname: replica ## (Optional) Define the hostname
+    container_name: moleculer-prometheus-demo-replica
+    env_file: docker-compose.env
+    environment:
+      SERVICES: greeter
+    labels:
+      - "traefik.enable=false"
+    depends_on:
+      - nats
+    ports:
+      - 9300:3030 ## Add a port in order to access the metrics
+    networks:
+      - internal
+
+  user:
+      build:
+        context: .
+      image: moleculer-prometheus-demo
+      hostname: user
+      container_name: moleculer-prometheus-demo-user
+      env_file: docker-compose.env
+      environment:
+        SERVICES: user
+      labels:
+        - "traefik.enable=false"
+      depends_on:
+        - nats
+      ports:
+        - 9400:3030 ## Add a port in order to access the metrics
+      networks:
+        - internal
+
+  nats:
+    image: nats
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - internal
+
+  traefik:
+    image: traefik:1.7
+    container_name: traefik
+    command:
+      - "--api"
+      - "--docker"
+      - "--docker.watch"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=traefik"
+      - "traefik.port=8080"
+    ports:
+      - 3000:80
+      - 3001:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /dev/null:/traefik.toml
+    networks:
+      - internal
+      - default
+
+  # From: https://prometheus.io/docs/guides/cadvisor/#docker-compose-configuration
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus:/etc/prometheus:ro ## Share "prometheus" dir with Prometheus service
+    networks:
+      - internal
+
+networks:
+  internal:
