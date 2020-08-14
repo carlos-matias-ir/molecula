@@ -7,23 +7,5 @@
     "targets": [
       "greeter:3030"
     ]
-  },
-  {
-    "labels": {
-      "job": "replica",
-      "nodeID": "replica-17"
-    },
-    "targets": [
-      "replica:3030"
-    ]
-  },
-  {
-    "labels": {
-      "job": "user",
-      "nodeID": "user-17"
-    },
-    "targets": [
-      "user:3030"
-    ]
   }
 ]
