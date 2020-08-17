@@ -12,7 +12,7 @@ module.exports = {
 	name: "orders",
 
 	mixins: [DbService],
-	adapter: new MongooseAdapter(process.env.MONGO_UI || "mongodb://appuser:Egg6Njsr7WhjKpPk@ds037067.mlab.com:37067/vmd"),
+	adapter: new MongooseAdapter(process.env.MONGO_URI),
 	model: Order,
 
 	/**

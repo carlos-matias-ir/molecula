@@ -26,14 +26,14 @@ module.exports = {
      */
     async hello(ctx) {
       const payload = `Hello from greeter@${this.broker.nodeID}`;
-      
-      ctx.emit("hello.called", payload );  
+     
+      // ctx.emit("hello.called", payload );  
       return payload;
     },
     async randomhello(ctx) {
       const payload = `Random Hello from greeter@${this.broker.nodeID}`;
       
-      const number = await ctx.call("helper.random");
+      const number = Math.round(Math.random()*100);
 
       ctx.emit("hello.called", { payload, number });  
       return { payload, number };

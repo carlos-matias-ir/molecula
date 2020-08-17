@@ -582,7 +582,7 @@
 						.filter(action => !!action);
 				},
 
-				getActionParams(action, maxLen) {
+				getActionParams(action = {}, maxLen = 0) {
 					if (action.action && action.action.params) {
 						const s = Object.keys(action.action.params).join(", ");
 						return s.length > maxLen ? s.substr(0, maxLen) + "…" : s;
@@ -667,20 +667,25 @@
 
 				updateNodeList: function (name) {
 					this.req("/api/~node/list", null).then(res => {
-						res.sort((a,b) => a.id.localeCompare(b.id));
-						this.nodes = res;
+						if (res.length) {
+							res.sort((a,b) => a.id.localeCompare(b.id));
+							this.nodes = res;
+						} 
 					});
 				},
 
 				updateServiceList: function (name) {
-					this.req("/api/~node/services?withActions=true", null)
+					this.req(`/api/~node/services?withActions=true`, null)
 						.then(res => {
+							if (res.length) {
 							this.services = res;
 							res.sort((a,b) => a.name.localeCompare(b.name));
 							res.forEach(svc => svc.nodes.sort());
+							}
 						})
 						.then(() => this.req("/api/~node/actions", null))
 						.then(res => {
+							if (res.length) {
 							res.sort((a,b) => a.name.localeCompare(b.name));
 							const actions = res.reduce((a,b) => {
 								a[b.name] = b;
@@ -688,6 +693,7 @@
 							}, {});
 
 							Vue.set(this, "actions", actions);
+							}
 						});
 				},
 

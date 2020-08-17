@@ -2,10 +2,28 @@
   {
     "labels": {
       "job": "greeter",
-      "nodeID": "greeter-17"
+      "nodeID": "greeter-19"
     },
     "targets": [
       "greeter:3030"
+    ]
+  },
+  {
+    "labels": {
+      "job": "api",
+      "nodeID": "api-17"
+    },
+    "targets": [
+      "api:3030"
+    ]
+  },
+  {
+    "labels": {
+      "job": "user",
+      "nodeID": "user-19"
+    },
+    "targets": [
+      "user:3030"
     ]
   }
 ]
