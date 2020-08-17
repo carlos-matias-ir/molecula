@@ -6,7 +6,6 @@ const Customer = require("../models/customer.model")
 
 /**
  * customers service
- * mongodb://mongo:27017/irdb"
  */
 module.exports = {
 
